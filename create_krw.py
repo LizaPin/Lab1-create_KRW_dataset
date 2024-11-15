@@ -70,3 +70,29 @@ def create_krw_dataset(days: int, max_retries: int = 3, time_delay: float = 0.7)
 
     print(f"Датасет сохранён в файл {filename}")
     return str(filename)
+
+def get_user_input(prompt: str, default_value, value_type, condition=lambda x: True):
+    """
+    Обрабатывает ввод пользователя с проверкой и поддержкой значения по умолчанию.
+    
+    Аргументы:
+        prompt (str): Сообщение для пользователя.
+        default_value: Значение по умолчанию, если пользователь не ввел данные.
+        value_type: Ожидаемый тип данных.
+        condition (callable): Функция для проверки корректности ввода.
+
+    Возвращает:
+        Значение, введенное пользователем, приведенное к нужному типу.
+    """
+    while True:
+        try:
+            user_input = input(prompt).strip()
+            if not user_input:
+                return default_value
+            value = value_type(user_input)
+            if condition(value):
+                return value
+            else:
+                print("Ввод не соответствует необходимым условиям.")
+        except ValueError:
+            print("Некорректный ввод. Пожалуйста, введите корректное значение.")
