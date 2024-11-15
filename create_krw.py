@@ -33,3 +33,40 @@ def fetch_krw_exchange_rate(url: str, retries: int = 3, delay: float = 5.0):
             print(f"Ошибка получения данных: {e}. Попытка {attempt + 1} из {retries}")
             time.sleep(delay)
     return None, None, None
+
+def create_krw_dataset(days: int, max_retries: int = 3, time_delay: float = 0.7):
+    """
+    Собирает данные курса корейской вонны (KRW) за указанный период и сохраняет их в CSV-файл.
+    
+    Аргументы:
+        days (int): Количество дней для сбора данных.
+        max_retries (int): Максимальное количество попыток для получения данных.
+        time_delay (float): Задержка в секундах между запросами.
+    
+    Возвращает:
+        str: Имя созданного файла с данными.
+    """
+    filename = DATA_DIR / f"KRW_dataset_{int(time.time())}.csv"
+    current_url = BASE_URL
+    current_day = 1
+
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write("Дата;Курс KRW\n")
+        while current_day <= days:
+            krw_rate, next_url, date = fetch_krw_exchange_rate(current_url, max_retries)
+            if krw_rate is None or next_url is None:
+                print(f"Ошибка получения данных для дня #{current_day}, пропуск.")
+                current_day += 1
+                continue
+
+            # Преобразование даты с помощью datetime
+            date = datetime.strptime(date.split("T")[0], "%Y-%m-%d").date()
+            file.write(f"{date};{krw_rate}\n")
+            print(f"День #{current_day}. Дата: {date}. Курс KRW: {krw_rate}₽")
+
+            current_url = "https:" + next_url
+            current_day += 1
+            time.sleep(time_delay)
+
+    print(f"Датасет сохранён в файл {filename}")
+    return str(filename)
