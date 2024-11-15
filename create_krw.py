@@ -96,3 +96,13 @@ def get_user_input(prompt: str, default_value, value_type, condition=lambda x: T
                 print("Ввод не соответствует необходимым условиям.")
         except ValueError:
             print("Некорректный ввод. Пожалуйста, введите корректное значение.")
+
+def main():
+    days = get_user_input("Введите количество дней (1): ", 1, int, lambda x: x > 0)
+    max_retries = get_user_input("Введите количество повторных попыток (3): ", 3, int, lambda x: x >= 0)
+    time_delay = get_user_input("Введите интервал между запросами в секундах (0.7): ", 0.7, float, lambda x: x > 0)
+
+    create_krw_dataset(days, max_retries, time_delay)
+
+if __name__ == "__main__":
+    main()
